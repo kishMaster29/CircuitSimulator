@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+
+<SplitPane fx:id="BasePane" dividerPositions="0.6605351170568562" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.circuitsimulator.Controller.HelloController">
+  <items>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+         <children>
+            <SplitPane dividerPositions="0.8787878787878788" layoutX="70.0" layoutY="136.0" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <items>
+                <AnchorPane fx:id="CanvasPane" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                     <children>
+                        <Pane fx:id="SimSpace" layoutX="73.0" layoutY="47.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                  </AnchorPane>
+                <AnchorPane maxHeight="100.0" minHeight="45.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="48.0" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="45.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#ResetClick" text="Reset" />
+                              <Button mnemonicParsing="false" onAction="#SaveClick" text="Save" />
+                              <Button mnemonicParsing="false" onAction="#LoadClick" text="Load" />
+                              <Label fx:id="ErrorText" prefHeight="17.0" prefWidth="162.0" />
+                           </children>
+                           <padding>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </padding>
+                        </HBox>
+                     </children>
+                  </AnchorPane>
+              </items>
+            </SplitPane>
+         </children></AnchorPane>
+    <AnchorPane fx:id="InfoPane" maxWidth="400.0" minHeight="-Infinity" minWidth="200.0">
+         <children>
+            <TabPane fx:id="PaneTab" layoutY="84.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <tabs>
+                <Tab text="Components">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <ListView fx:id="ComponentList" layoutY="116.0" prefHeight="200.0" prefWidth="200.0" stylesheets="@../../../../list.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Properties">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="InputField" layoutX="26.0" layoutY="14.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0" />
+                              <HBox layoutX="10.0" layoutY="35.0" prefHeight="25.0" prefWidth="180.0" spacing="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="80.0">
+                                 <children>
+                                    <Button fx:id="ok" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#okPress" prefWidth="10000.0" text="OK" HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="cancel" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#cancelPress" prefWidth="10000.0" text="Cancel" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                              <CheckBox fx:id="closeToggle" layoutX="10.0" layoutY="88.0" mnemonicParsing="false" text="Closed" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="115.0" />
+                              <Separator layoutX="10.0" layoutY="101.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="140.0" />
+                              <Label fx:id="NameLabel" layoutX="29.0" layoutY="6.0" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Resistor" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                              <Separator layoutX="10.0" layoutY="36.0" prefWidth="200.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="37.0" />
+                              <Label fx:id="Info1" alignment="CENTER" layoutX="10.0" layoutY="151.0" prefHeight="40.0" style="-fx-background-radius: 5; -fx-background-color: #DBDBDB; -fx-font-weight: bold; -fx-font-size: 18;" text="Label" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="150.0" />
+                              <Label fx:id="Info2" alignment="CENTER" layoutX="10.0" layoutY="201.0" prefHeight="40.0" style="-fx-background-radius: 5; -fx-background-color: #DBDBDB; -fx-font-weight: bold; -fx-font-size: 18;" text="Label" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="200.0" />
+                              <Label fx:id="Info3" alignment="CENTER" layoutX="20.0" layoutY="211.0" prefHeight="40.0" style="-fx-background-radius: 5; -fx-background-color: #DBDBDB; -fx-font-weight: bold; -fx-font-size: 18;" text="Label" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="250.0" />
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </children></AnchorPane>
+  </items>
+</SplitPane>
