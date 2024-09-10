@@ -21,6 +21,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -635,29 +636,39 @@ public class HelloController {
     }
 
     private void ResetAll() {
-        if (selected_component != null) {
-            if (selected_component instanceof Wire) {
-                SimSpace.getChildren().remove(lineHighlight);
-            } else {
-                selected_component.RemoveHighlight();
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setTitle("Reset");
+        a.setContentText("This action will clear the current work area. Continue?");
+
+        Optional<ButtonType> result = a.showAndWait();
+        if (result.get().equals(ButtonType.OK)) {
+            a.close();
+            if (selected_component != null) {
+                if (selected_component instanceof Wire) {
+                    SimSpace.getChildren().remove(lineHighlight);
+                } else {
+                    selected_component.RemoveHighlight();
+                }
             }
-        }
-        selected_component = null;
-        HideInspector();
-        for (CircuitComponent c : CircuitComponent.getConnectables()) {
-            SimSpace.getChildren().remove(c.getImageView());
-            if (c instanceof Wire) {
-                SimSpace.getChildren().remove(wire_components.get(c));
-                SimSpace.getChildren().remove(lineHighlight);
-            } else if (c instanceof Load) {
-                SimSpace.getChildren().remove(load_components.get(c));
+            selected_component = null;
+            HideInspector();
+            for (CircuitComponent c : CircuitComponent.getConnectables()) {
+                SimSpace.getChildren().remove(c.getImageView());
+                if (c instanceof Wire) {
+                    SimSpace.getChildren().remove(wire_components.get(c));
+                    SimSpace.getChildren().remove(lineHighlight);
+                } else if (c instanceof Load) {
+                    SimSpace.getChildren().remove(load_components.get(c));
+                }
+                SimSpace.getChildren().remove(c.getNode1());
+                SimSpace.getChildren().remove(c.getNode2());
             }
-            SimSpace.getChildren().remove(c.getNode1());
-            SimSpace.getChildren().remove(c.getNode2());
+            wire_components.clear();
+            SimHandler.ClearAll();
+            CircuitComponent.ClearAll();
+        } else {
+            a.close();
         }
-        wire_components.clear();
-        SimHandler.ClearAll();
-        CircuitComponent.ClearAll();
     }
 
     private double roundNearest25(double n) {
