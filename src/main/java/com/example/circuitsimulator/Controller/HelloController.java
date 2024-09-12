@@ -1,11 +1,15 @@
 package com.example.circuitsimulator.Controller;
 
+import com.example.circuitsimulator.HelloApplication;
 import com.example.circuitsimulator.Model.*;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,8 +42,6 @@ public class HelloController {
     @FXML
     public AnchorPane InfoPane;
     @FXML
-    public Label ErrorText;
-    @FXML
     public TextField InputField;
     @FXML
     public Button ok;
@@ -57,6 +59,8 @@ public class HelloController {
     public Label Info3;
     @FXML
     public TabPane PaneTab;
+    @FXML
+    public Hyperlink aboutLink;
 
     private final String[] file_name = {"resistor.png", "battery.png", "load.png", "open_switch.png", "wire.png", "closed_switch.png"};
     private final String[] highlight_file_name = {"select_resistor.png", "select_battery.png", "select_load.png", "select_open_switch.png", "select_wire.png", "select_closed_switch.png"};
@@ -75,6 +79,7 @@ public class HelloController {
 
     @FXML
     public void initialize() {
+        BasePane.setDividerPositions(0.9);
 
         for (String s : file_name) {
             Image component = new Image(s);
@@ -202,13 +207,6 @@ public class HelloController {
             } else {
                 c = null;
             }
-//            Arrow arrow = new Arrow();
-//            arrow.setStartX(c.getNode1().getLayoutX());
-//            arrow.setStartY(c.getNode1().getLayoutY());
-//            arrow.setEndX(c.getNode2().getLayoutX());
-//            arrow.setEndY(c.getNode2().getLayoutY());
-//            SimSpace.getChildren().add(arrow);
-//            arrow.toFront();
 
             SimHandler.updateConnections(c);
             dragEvent.consume();
@@ -802,5 +800,18 @@ public class HelloController {
         temp.add(delX);
         temp.add(delY);
         return temp;
+    }
+
+    public void openAbout() {
+        try {
+            Stage stage = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("View/about-programmer.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+            stage.setTitle("About Programmer");
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
@@ -25,14 +26,14 @@
                         <Pane fx:id="SimSpace" layoutX="73.0" layoutY="47.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
-                <AnchorPane maxHeight="100.0" minHeight="45.0">
+                <AnchorPane maxHeight="45.0" minHeight="45.0" prefHeight="45.0">
                      <children>
                         <HBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="48.0" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="45.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
                               <Button mnemonicParsing="false" onAction="#ResetClick" text="Reset" />
                               <Button mnemonicParsing="false" onAction="#SaveClick" text="Save" />
                               <Button mnemonicParsing="false" onAction="#LoadClick" text="Load" />
-                              <Label fx:id="ErrorText" prefHeight="17.0" prefWidth="162.0" />
+                              <Hyperlink fx:id="aboutLink" onAction="#openAbout" style="-fx-underline: true;" text="About Programmer" />
                            </children>
                            <padding>
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -43,9 +44,9 @@
               </items>
             </SplitPane>
          </children></AnchorPane>
-    <AnchorPane fx:id="InfoPane" maxWidth="400.0" minHeight="-Infinity" minWidth="200.0">
+    <AnchorPane fx:id="InfoPane" maxWidth="210.0" minHeight="-Infinity" minWidth="210.0" prefWidth="210.0">
          <children>
-            <TabPane fx:id="PaneTab" layoutY="84.0" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <TabPane fx:id="PaneTab" layoutY="84.0" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <tabs>
                 <Tab text="Components">
                   <content>
