@@ -12,6 +12,11 @@ public class Switch extends CircuitComponent implements CircuitProperties {
         open = true;
     }
 
+    @Override
+    public String get_name() {
+        return "Switch";
+    }
+
     public void toggleSwitch() {
         open = !open;
     }
@@ -23,7 +28,7 @@ public class Switch extends CircuitComponent implements CircuitProperties {
     @Override
     public double getResistance() {
         if (!open) return 0;
-        else return 1000000000.0;
+        else return 1000000.0;
     }
 
     @Override

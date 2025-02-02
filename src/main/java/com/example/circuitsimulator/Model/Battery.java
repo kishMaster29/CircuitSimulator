@@ -12,6 +12,10 @@ public class Battery extends CircuitComponent implements CircuitProperties {
         this.emf = emf;
     }
 
+    public String get_name() {
+        return "Battery";
+    }
+
     public void setEmf(double emf) {
         this.emf = emf;
     }

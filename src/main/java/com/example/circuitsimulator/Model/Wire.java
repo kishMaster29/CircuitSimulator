@@ -12,6 +12,10 @@ public class Wire extends CircuitComponent implements CircuitProperties {
         length = 200;
     }
 
+    public String get_name() {
+        return "Wire";
+    }
+
     public double getLength() {
         return length;
     }

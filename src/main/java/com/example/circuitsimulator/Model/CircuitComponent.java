@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CircuitComponent {
+public abstract class CircuitComponent {
     private static final ArrayList<Circle> NODES = new ArrayList<>();
     private static final ArrayList<CircuitComponent> COMPONENTS = new ArrayList<>();
     private static final Map<Circle, CircuitComponent> NODE_CONNECTIONS = new HashMap<>();
@@ -32,10 +32,10 @@ public class CircuitComponent {
         this.alt = alt;
         this.node1 = new Circle(0, 0, 5);
         node1.setLayoutX(view.getLayoutX());
-        node1.setLayoutY(view.getLayoutY() + 71);
+        node1.setLayoutY(view.getLayoutY() + 70.5);
         this.node2 = new Circle(0, 0, 5);
         node2.setLayoutX(view.getLayoutX() + 200);
-        node2.setLayoutY(view.getLayoutY() + 71);
+        node2.setLayoutY(view.getLayoutY() + 70.5);
         this.imageView = view;
 
         NODES.add(node1);
@@ -158,4 +158,6 @@ public class CircuitComponent {
         COMPONENTS.clear();
         NODE_CONNECTIONS.clear();
     }
+
+    public abstract String get_name();
 }

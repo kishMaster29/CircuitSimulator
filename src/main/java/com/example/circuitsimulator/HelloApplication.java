@@ -1,30 +1,23 @@
 package com.example.circuitsimulator;
 
-import com.example.circuitsimulator.Controller.HelloController;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -44,7 +37,7 @@ public class HelloApplication extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("View/hello-view.fxml"));
             newPage = fxmlLoader.load();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("An error has occurred.");
         }
 
         ImageView imageView = new ImageView(new Image(SPLASH_IMAGE));
@@ -70,8 +63,8 @@ public class HelloApplication extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws IOException {
-        final Task<ObservableList<String>> loadTask = new Task<ObservableList<String>>() {
+    public void start(Stage stage) {
+        final Task<ObservableList<String>> loadTask = new Task<>() {
             @Override
             protected ObservableList<String> call() throws Exception {
 
@@ -84,7 +77,7 @@ public class HelloApplication extends Application {
                 updateMessage("Loading...");
                 for (int i = 0; i < allProgress.size(); i++) {
                     Thread.sleep(500);
-                    updateProgress(i+1, allProgress.size());
+                    updateProgress(i + 1, allProgress.size());
                     String nextProgress = allProgress.get(i);
                     completedProgress.add(nextProgress);
                     updateMessage("Loading...Finished loading " + nextProgress);
@@ -94,11 +87,11 @@ public class HelloApplication extends Application {
                 return completedProgress;
             }
         };
-        showSplash(stage, loadTask, ()->showMainStage(loadTask.valueProperty()));
+        showSplash(stage, loadTask, this::showMainStage);
         new Thread(loadTask).start();
     }
 
-    private void showMainStage(ReadOnlyObjectProperty<ObservableList<String>> loaded) {
+    private void showMainStage() {
         newPage.setOpacity(0);
         mainScene.setRoot(newPage);
         FadeTransition fadeSplash = new FadeTransition(Duration.seconds(1.5), newPage);
@@ -118,7 +111,7 @@ public class HelloApplication extends Application {
                 FadeTransition fadeSplash = new FadeTransition(Duration.seconds(1.5), splashLayout);
                 fadeSplash.setFromValue(1.0);
                 fadeSplash.setToValue(0.0);
-                fadeSplash.setOnFinished(_ -> {initCompletionHandler.complete();});
+                fadeSplash.setOnFinished(_ -> initCompletionHandler.complete());
                 fadeSplash.play();
             }
         });

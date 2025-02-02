@@ -12,6 +12,11 @@ public class Load extends CircuitComponent implements CircuitProperties {
         this.resistance = resistance;
     }
 
+    @Override
+    public String get_name() {
+        return "Load";
+    }
+
     public void setResistance(double resistance) {
         this.resistance = resistance;
     }

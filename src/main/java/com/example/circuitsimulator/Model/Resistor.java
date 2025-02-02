@@ -16,6 +16,10 @@ public class Resistor extends CircuitComponent implements CircuitProperties {
         this.resistance = resistance;
     }
 
+    public String get_name() {
+        return "Resistor";
+    }
+
     @Override
     public double getResistance() {
         return resistance;

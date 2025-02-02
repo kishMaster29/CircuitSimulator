@@ -1,5 +1,6 @@
 package com.example.circuitsimulator.Model;
 
+import javafx.scene.control.Alert;
 import javafx.scene.shape.Circle;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
@@ -15,6 +16,7 @@ public class SimHandler {
     private static final Graph<Circle, DefaultEdge> graph = new DefaultUndirectedGraph<>(DefaultEdge.class);
     private static final PatonCycleBase<Circle, DefaultEdge> finder = new PatonCycleBase<>(graph);
     private static final ArrayList<ArrayList<Circle>> cycles = new ArrayList<>();
+    private static ArrayList<ArrayList<Circle>> err_connections = new ArrayList<>();
 
     public static void updateConnections(CircuitComponent c) {
         int remove_count = 0;
@@ -250,14 +252,31 @@ public class SimHandler {
                     current_accum -= currents[x];
                 }
                 c.setFinalCurrent(current_accum);
+                System.out.println(c.getFinalCurrent());
             }
+            err_connections = null;
         } catch (NoDataException ex) {
             for (CircuitComponent c : CircuitComponent.getConnectables()) {
                 c.setFinalCurrent(0);
             }
+            err_connections = null  ;
         } catch (SingularMatrixException ex) {
-            ex.printStackTrace();
+            for (CircuitComponent c : CircuitComponent.getConnectables()) {
+                c.setFinalCurrent(0);
+            }
+
+            if (!connections.equals(err_connections)) {
+                err_connections = connections;
+
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Error");
+                a.setHeaderText(null);
+                a.setContentText("Short Circuit Detected");
+                a.showAndWait();
+            }
         }
+
+        System.out.println();
     }
 
     public static void removeFromConnections(CircuitComponent c) {

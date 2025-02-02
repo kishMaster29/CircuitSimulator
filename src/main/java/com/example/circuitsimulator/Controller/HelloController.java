@@ -2,7 +2,6 @@ package com.example.circuitsimulator.Controller;
 
 import com.example.circuitsimulator.HelloApplication;
 import com.example.circuitsimulator.Model.*;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
@@ -79,6 +78,7 @@ public class HelloController {
 
     @FXML
     public void initialize() {
+        BasePane.requestFocus();
         BasePane.setDividerPositions(0.9);
 
         for (String s : file_name) {
@@ -123,7 +123,7 @@ public class HelloController {
             dragEvent.consume();
         });
 
-        SimSpace.setOnMousePressed(mouseEvent -> {
+        SimSpace.setOnMousePressed(_ -> {
             boolean flag = true;
             for (CircuitComponent c : CircuitComponent.getConnectables()) {
                 if (c.getImageView().isPressed()) {
@@ -169,21 +169,13 @@ public class HelloController {
                 setupDrag(view, view, c);
             } else if (index == 2) {
                 c = new Load(1, view, SimSpace, img, highlight_canvas_images.get(index));
-                setupDrag(view, view, c);
-                Circle bulb_light = new Circle();
-                bulb_light.setRadius(45);
-                ObjectBinding<Color> colorBinding = Bindings.createObjectBinding(() -> Color.hsb(50, Math.max(0, Math.min(1, (Math.abs(c.getFinalCurrent()))/10)), 1), c.currentProperty());
-                bulb_light.fillProperty().bind(colorBinding);
-                bulb_light.layoutXProperty().bind(view.layoutXProperty().add(102));
-                bulb_light.layoutYProperty().bind(view.layoutYProperty().add(72));
-                load_components.put(c, bulb_light);
-                SimSpace.getChildren().add(bulb_light);
-                bulb_light.toBack();
+                LoadSetup(view, c);
             } else if (index == 3) {
                 c = new Switch(view, SimSpace, img, highlight_canvas_images.get(index));
                 setupDrag(view, view, c);
             } else if (index == 4) {
-                view.setVisible(false);
+                view.setPickOnBounds(true);
+                view.setOpacity(0);
                 c = new Wire(view, SimSpace, img, highlight_canvas_images.get(index));
 
                 // Instead of ImageView, Wire is treated as a Line to facilitate increase and decrease of length
@@ -232,6 +224,8 @@ public class HelloController {
 
                 SimHandler.updateConnections(selected_component);
                 wire.setLength(wire.getLength() + 50);
+                setWireImgPos(wire, c1, c2);
+
             } else if (keyEvent.getCode().equals(KeyCode.O) && selected_component instanceof Wire wire) {
                 if (wire.getLength() > 50) {
                     Circle c1 = selected_component.getNode1();
@@ -248,22 +242,15 @@ public class HelloController {
                     c1.setLayoutY(c1.getLayoutY() + delY * 25);
                     SimHandler.updateConnections(selected_component);
                     wire.setLength(wire.getLength() - 50);
+                    setWireImgPos(wire, c1, c2);
                 }
-            } else if (keyEvent.getCode().equals(KeyCode.D) && selected_component != null) {
+            } else if ((keyEvent.getCode().equals(KeyCode.DELETE) | keyEvent.getCode().equals(KeyCode.D) | keyEvent.getCode().equals(KeyCode.BACK_SPACE)) && selected_component != null) {
                 CircuitComponent.getConnectables().remove(selected_component);
                 CircuitComponent.getNodes().remove(selected_component.getNode1());
                 CircuitComponent.getNodes().remove(selected_component.getNode2());
                 CircuitComponent.getNodeConnections().remove(selected_component.getNode1());
                 CircuitComponent.getNodeConnections().remove(selected_component.getNode2());
-                SimSpace.getChildren().remove(selected_component.getImageView());
-                if (selected_component instanceof Wire) {
-                    SimSpace.getChildren().remove(wire_components.get(selected_component));
-                    SimSpace.getChildren().remove(lineHighlight);
-                } else if (selected_component instanceof Load) {
-                    SimSpace.getChildren().remove(load_components.get(selected_component));
-                }
-                SimSpace.getChildren().remove(selected_component.getNode1());
-                SimSpace.getChildren().remove(selected_component.getNode2());
+                delete(selected_component);
                 SimHandler.removeFromConnections(selected_component);
                 SimHandler.generateCycles();
                 SimHandler.addCurrents();
@@ -362,38 +349,54 @@ public class HelloController {
         InputField.setTextFormatter(new TextFormatter<>(filter));
     }
 
+    private void delete(CircuitComponent selectedComponent) {
+        SimSpace.getChildren().remove(selectedComponent.getImageView());
+        if (selectedComponent instanceof Wire) {
+            SimSpace.getChildren().remove(wire_components.get(selectedComponent));
+            SimSpace.getChildren().remove(lineHighlight);
+        } else if (selectedComponent instanceof Load) {
+            SimSpace.getChildren().remove(load_components.get(selectedComponent));
+        }
+        SimSpace.getChildren().remove(selectedComponent.getNode1());
+        SimSpace.getChildren().remove(selectedComponent.getNode2());
+    }
+
+    private void LoadSetup(ImageView view, CircuitComponent c) {
+        setupDrag(view, view, c);
+        Circle bulb_light = new Circle();
+        bulb_light.setRadius(45);
+        ObjectBinding<Color> colorBinding = Bindings.createObjectBinding(() -> Color.hsb(50, Math.max(0, Math.min(1, (Math.abs(c.getFinalCurrent()))/10)), 1), c.currentProperty());
+        bulb_light.fillProperty().bind(colorBinding);
+        bulb_light.layoutXProperty().bind(view.layoutXProperty().add(102));
+        bulb_light.layoutYProperty().bind(view.layoutYProperty().add(72));
+        load_components.put(c, bulb_light);
+        SimSpace.getChildren().add(bulb_light);
+        bulb_light.toBack();
+    }
+
+    private void setWireImgPos(Wire wire, Circle c1, Circle c2) {
+        wire.getImageView().setFitWidth(wire.getLength());
+
+        double cx;
+        double cy;
+
+        if (!wire.isRotate()) {
+            cx = (c1.getLayoutX() + c2.getLayoutX())/2 - wire.getImageView().getBoundsInParent().getWidth()/2;
+            cy = (c1.getLayoutY() + c2.getLayoutY())/2 - wire.getImageView().getBoundsInParent().getHeight()/2;
+        } else {
+            cx = (c1.getLayoutX() + c2.getLayoutX())/2 - wire.getImageView().getBoundsInParent().getHeight()/2;
+            cy = (c1.getLayoutY() + c2.getLayoutY())/2 - wire.getImageView().getBoundsInParent().getWidth()/2;
+        }
+
+        wire.getImageView().setLayoutX(cx);
+        wire.getImageView().setLayoutY(cy);
+    }
+
     private void setupDrag(Node node, Node node2, CircuitComponent c) {
-        node.setOnMousePressed(mouseEvent -> {
-            if (selected_component != null) {
-                if (selected_component instanceof Wire) {
-                    SimSpace.getChildren().remove(lineHighlight);
-                } else {
-                    selected_component.RemoveHighlight();
-                }
-            }
-            selected_component = c;
-            HighlightComponent(node, c);
+        if (node instanceof Line line) {
+            node.setPickOnBounds(true);
 
-            ShowLabels();
-            SetText();
-
-            dragged = true;
-            drag_delta_x = (int) (node2.getLayoutX() - mouseEvent.getSceneX());
-            drag_delta_y = (int) (node2.getLayoutY() - mouseEvent.getSceneY());
-        });
-
-        node.setOnMouseDragged(mouseEvent -> c.setPos(mouseEvent.getSceneX() + drag_delta_x, mouseEvent.getSceneY() + drag_delta_y));
-
-        node.setOnMouseReleased(_ -> {
-            if (dragged) {
-                c.setPos(roundNearest25(c.getX()), roundNearest25(c.getY()));
-                SimHandler.updateConnections(c);
-                dragged = false;
-            }
-        });
-
-        node.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 1 && !dragged) {
+            node2.setOnMousePressed(mouseEvent -> {
                 if (selected_component != null) {
                     if (selected_component instanceof Wire) {
                         SimSpace.getChildren().remove(lineHighlight);
@@ -401,11 +404,53 @@ public class HelloController {
                         selected_component.RemoveHighlight();
                     }
                 }
-                HighlightComponent(node, c);
-                c.Highlight();
                 selected_component = c;
+                HighlightComponent(node, c);
                 ShowLabels();
                 SetText();
+
+                dragged = true;
+                drag_delta_x = (int) (node2.getLayoutX() - mouseEvent.getSceneX());
+                drag_delta_y = (int) (node2.getLayoutY() - mouseEvent.getSceneY());
+            });
+
+            mouseDrag(node2, c);
+
+        } else {
+            node.setPickOnBounds(true);
+
+            node.setOnMousePressed(mouseEvent -> {
+                if (selected_component != null) {
+                    if (selected_component instanceof Wire) {
+                        SimSpace.getChildren().remove(lineHighlight);
+                    } else {
+                        selected_component.RemoveHighlight();
+                    }
+                }
+                selected_component = c;
+                HighlightComponent(node, c);
+                c.Highlight();
+
+                ShowLabels();
+                SetText();
+
+                dragged = true;
+                drag_delta_x = (int) (node2.getLayoutX() - mouseEvent.getSceneX());
+                drag_delta_y = (int) (node2.getLayoutY() - mouseEvent.getSceneY());
+            });
+
+            mouseDrag(node, c);
+        }
+    }
+
+    private void mouseDrag(Node node, CircuitComponent c) {
+        node.setOnMouseDragged(mouseEvent -> c.setPos(mouseEvent.getSceneX() + drag_delta_x, mouseEvent.getSceneY() + drag_delta_y));
+
+        node.setOnMouseReleased(_ -> {
+            if (dragged) {
+                c.setPos(roundNearest25(c.getX()), roundNearest25(c.getY()));
+                SimHandler.updateConnections(c);
+                dragged = false;
             }
         });
     }
@@ -491,10 +536,13 @@ public class HelloController {
 
                     fw.write(c.getX() + "," + c.getY() + "," + type + "," + extras1 + "," + extras2 + "," + rotate + "\n");
                 }
-
                 fw.close();
-            } catch (IOException e) {
-                System.out.println("Error creating file");
+            } catch (Exception e) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Error");
+                a.setHeaderText(null);
+                a.setContentText("Error creating and saving file");
+                a.showAndWait();
             }
         }
 
@@ -546,16 +594,7 @@ public class HelloController {
                         setupDrag(view, view, c);
                     } else if (type == 2) {
                         c = new Load(extras1, view, SimSpace, img, highlight_canvas_images.get(type));
-                        setupDrag(view, view, c);
-                        Circle bulb_light = new Circle();
-                        bulb_light.setRadius(45);
-                        ObjectBinding<Color> colorBinding = Bindings.createObjectBinding(() -> Color.hsb(50, Math.max(0, Math.min(1, (Math.abs(c.getFinalCurrent()))/10)), 1), c.currentProperty());
-                        bulb_light.fillProperty().bind(colorBinding);
-                        bulb_light.layoutXProperty().bind(view.layoutXProperty().add(102));
-                        bulb_light.layoutYProperty().bind(view.layoutYProperty().add(72));
-                        load_components.put(c, bulb_light);
-                        SimSpace.getChildren().add(bulb_light);
-                        bulb_light.toBack();
+                        LoadSetup(view, c);
                     } else if (type == 3) {
                         if (extras2 == 0) {
                             c = new Switch(view, SimSpace, img, highlight_canvas_images.get(5));
@@ -565,7 +604,8 @@ public class HelloController {
                         }
                         setupDrag(view, view, c);
                     } else if (type == 4) {
-                        view.setVisible(false);
+                        view.setPickOnBounds(true);
+                        view.setOpacity(0);
                         c = new Wire(view, SimSpace, img, highlight_canvas_images.get(type));
 
                         // Instead of ImageView, Wire is treated as a Line to facilitate increase and decrease of length
@@ -613,6 +653,8 @@ public class HelloController {
                             c1.setLayoutY(c1.getLayoutY() - delY * val);
                         }
                         ((Wire)c).setLength(extras1);
+                        setWireImgPos((Wire)c, c.getNode1(), c.getNode2());
+
 
                     } else {
                         c = null;
@@ -623,8 +665,12 @@ public class HelloController {
                     c.setPos(x_pos, y_pos);
                     SimHandler.updateConnections(c);
                 }
-            } catch (IOException e) {
-                System.out.println("Error reading file");
+            } catch (Exception e) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setTitle("Error");
+                a.setHeaderText(null);
+                a.setContentText("Error reading file");
+                a.showAndWait();
             }
         }
     }
@@ -651,15 +697,7 @@ public class HelloController {
             selected_component = null;
             HideInspector();
             for (CircuitComponent c : CircuitComponent.getConnectables()) {
-                SimSpace.getChildren().remove(c.getImageView());
-                if (c instanceof Wire) {
-                    SimSpace.getChildren().remove(wire_components.get(c));
-                    SimSpace.getChildren().remove(lineHighlight);
-                } else if (c instanceof Load) {
-                    SimSpace.getChildren().remove(load_components.get(c));
-                }
-                SimSpace.getChildren().remove(c.getNode1());
-                SimSpace.getChildren().remove(c.getNode2());
+                delete(c);
             }
             wire_components.clear();
             SimHandler.ClearAll();
@@ -692,6 +730,8 @@ public class HelloController {
         Info1.textProperty().bind(formatted1);
         closeToggle.setVisible(false);
 
+        NameLabel.setText(selected_component.get_name());
+
         if (selected_component instanceof Resistor resistor) {
             StringBinding formatted2 = Bindings.createStringBinding(() ->
                             String.format("PD: %.2f Volts", resistor.getResistance() * Math.abs(selected_component.getFinalCurrent())),
@@ -705,7 +745,6 @@ public class HelloController {
                     selected_component.currentProperty()
             );
             Info3.textProperty().bind(formatted3);
-            NameLabel.setText("Resistor");
         } else if (selected_component instanceof Battery battery) {
             Info3.setVisible(false);
             StringBinding formatted2 = Bindings.createStringBinding(() ->
@@ -713,13 +752,11 @@ public class HelloController {
                     selected_component.currentProperty()
             );
             Info2.textProperty().bind(formatted2);
-            NameLabel.setText("Battery");
         } else if (selected_component instanceof Wire) {
             InputField.setText("");
             InputField.setDisable(true);
             Info2.setVisible(false);
             Info3.setVisible(false);
-            NameLabel.setText("Wire");
         } else if (selected_component instanceof Switch switch_element) {
             InputField.setText("");
             closeToggle.setVisible(true);
@@ -744,8 +781,6 @@ public class HelloController {
                 SimHandler.addCurrents();
                 SimHandler.Calculate();
             });
-
-            NameLabel.setText("Switch");
         } else if (selected_component instanceof Load load) {
             StringBinding formatted2 = Bindings.createStringBinding(() ->
                             String.format("PD: %.2f Volts", load.getResistance() * Math.abs(selected_component.getFinalCurrent())),
@@ -759,8 +794,6 @@ public class HelloController {
                     selected_component.currentProperty()
             );
             Info3.textProperty().bind(formatted3);
-
-            NameLabel.setText("Load");
         }
     }
 
@@ -811,7 +844,7 @@ public class HelloController {
             stage.setScene(scene);
             stage.show();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.out.println("FXML Load error");
         }
     }
 }
